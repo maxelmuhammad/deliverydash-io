@@ -1,12 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { Truck, Search, Shield, Users, MapPin, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Index = () => {
   const { user } = useAuth();
+  const [trackingId, setTrackingId] = useState("MYAPP12345");
+  const [trackingResult, setTrackingResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCreateDemoTracking = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-tracking');
+      
+      if (error) throw error;
+      
+      toast.success("Demo tracking MYAPP12345 created successfully!");
+      setTrackingResult(data);
+    } catch (error) {
+      console.error('Error creating demo tracking:', error);
+      toast.error("Failed to create demo tracking");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTrackPackage = async () => {
+    if (!trackingId.trim()) {
+      toast.error("Please enter a tracking ID");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('track', {
+        body: { tracking_id: trackingId }
+      });
+      
+      if (error) throw error;
+      
+      setTrackingResult(data);
+      toast.success("Tracking information fetched!");
+    } catch (error) {
+      console.error('Error tracking package:', error);
+      toast.error("Failed to fetch tracking information");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,6 +160,55 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Demo Tracking Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-6">Test Our Tracking System</h2>
+            <div className="space-y-6">
+              <Button 
+                onClick={handleCreateDemoTracking} 
+                disabled={isLoading}
+                size="lg"
+                className="w-full sm:w-auto"
+              >
+                {isLoading ? "Creating..." : "Create Demo Tracking"}
+              </Button>
+              
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
+                <Input
+                  value={trackingId}
+                  onChange={(e) => setTrackingId(e.target.value)}
+                  placeholder="Enter tracking ID"
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleTrackPackage} 
+                  disabled={isLoading || !trackingId.trim()}
+                  size="lg"
+                  className="w-full sm:w-auto"
+                >
+                  {isLoading ? "Tracking..." : "Track Package"}
+                </Button>
+              </div>
+
+              {trackingResult && (
+                <Card className="text-left mt-6">
+                  <CardHeader>
+                    <CardTitle>Tracking Result</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <pre className="bg-muted p-4 rounded-md overflow-auto text-sm">
+                      {JSON.stringify(trackingResult, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-muted">
         <div className="container mx-auto px-4 text-center">
@@ -128,9 +224,19 @@ const Index = () => {
                 Start Tracking Now
               </Link>
             </Button>
-            <div className="text-sm text-muted-foreground">
-              Try with sample IDs: ABC123, XYZ789, DEF456
-            </div>
+            {user ? (
+              <Link to="/dashboard">
+                <Button variant="outline" size="lg">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" size="lg">
+                  Admin Login
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
