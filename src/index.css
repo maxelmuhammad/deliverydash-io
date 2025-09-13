@@ -15,31 +15,31 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 20%;
 
-    /* Royal Blue Primary Theme */
-    --primary: 219 96% 32%;
+    /* Clean Red & White Theme */
+    --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 219 96% 28%;
+    --primary-hover: 0 84% 56%;
     
-    /* Red Accent */
-    --accent-red: 4 85% 58%;
-    --accent-red-foreground: 0 0% 100%;
-    --accent-red-hover: 4 85% 54%;
+    /* White Accent */
+    --accent-red: 0 0% 100%;
+    --accent-red-foreground: 0 84% 60%;
+    --accent-red-hover: 0 0% 95%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 15% 20%;
+    --secondary: 0 0% 98%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 8% 46%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 46%;
 
-    --accent: 220 14% 96%;
-    --accent-foreground: 220 15% 20%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 20%;
 
-    --destructive: 4 85% 58%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 219 96% 32%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 84% 60%;
 
     --radius: 0.75rem;
 
@@ -51,7 +51,7 @@
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(219 96% 28%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(0 84% 56%) 100%);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

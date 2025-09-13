@@ -32,11 +32,10 @@ const Track = () => {
     setSearched(true);
 
     try {
-      const { data, error } = await supabase
-        .from('shipments')
-        .select('*')
-        .eq('id', trackingId.trim())
-        .maybeSingle();
+      // Use the edge function for tracking
+      const { data, error } = await supabase.functions.invoke('track-shipment', {
+        body: { tracking_id: trackingId.trim() }
+      });
 
       if (error) {
         toast({
@@ -47,9 +46,14 @@ const Track = () => {
         return;
       }
 
-      setShipment(data);
-      
-      if (!data) {
+      if (data && !data.error) {
+        setShipment(data);
+        toast({
+          title: "Shipment Found",
+          description: `Tracking successful for ID: ${trackingId}`,
+        });
+      } else {
+        setShipment(null);
         toast({
           title: "Not Found",
           description: `No shipment found with tracking ID: ${trackingId}`,
@@ -57,6 +61,7 @@ const Track = () => {
         });
       }
     } catch (error) {
+      setShipment(null);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
