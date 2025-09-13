@@ -33,11 +33,12 @@ const Track = () => {
 
     try {
       // Use the edge function for tracking
-      const { data, error } = await supabase.functions.invoke('track-shipment', {
+      const { data, error } = await supabase.functions.invoke('track', {
         body: { tracking_id: trackingId.trim() }
       });
 
       if (error) {
+        console.error('Supabase function error:', error);
         toast({
           title: "Error",
           description: "Failed to search for shipment. Please try again.",
@@ -47,7 +48,16 @@ const Track = () => {
       }
 
       if (data && !data.error) {
-        setShipment(data);
+        // Handle AfterShip response format
+        const trackingData = data.data?.tracking || data;
+        setShipment({
+          id: trackingData.tracking_number || trackingId,
+          status: trackingData.tag || trackingData.status || 'Unknown',
+          location: trackingData.checkpoints?.[0]?.location || trackingData.location || 'Unknown',
+          coordinates: trackingData.checkpoints?.[0]?.coordinates || null,
+          created_at: trackingData.created_at || new Date().toISOString(),
+          updated_at: trackingData.updated_at || new Date().toISOString(),
+        });
         toast({
           title: "Shipment Found",
           description: `Tracking successful for ID: ${trackingId}`,
@@ -56,7 +66,7 @@ const Track = () => {
         setShipment(null);
         toast({
           title: "Not Found",
-          description: `No shipment found with tracking ID: ${trackingId}`,
+          description: data?.error || `No shipment found with tracking ID: ${trackingId}`,
           variant: "destructive",
         });
       }
@@ -107,7 +117,7 @@ const Track = () => {
                 Track Package
               </CardTitle>
               <CardDescription>
-                Enter your tracking ID (e.g., ABC123, XYZ789)
+                Enter your tracking ID (e.g., MYAPP12345 after creating demo)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -187,7 +197,7 @@ const Track = () => {
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Try sample tracking IDs: ABC123, XYZ789, DEF456
+              Try sample tracking ID: MYAPP12345 (after creating demo tracking)
             </p>
           </div>
         </div>
