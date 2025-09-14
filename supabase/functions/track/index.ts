@@ -23,33 +23,20 @@ serve(async (req) => {
     const aftershipApiKey = Deno.env.get('AFTERSHIP_API_KEY')
     
     if (!aftershipApiKey) {
-      // Return mock data if no API key is configured
       return new Response(
-        JSON.stringify({
-          data: {
-            tracking: {
-              tracking_number: tracking_id,
-              tag: 'InTransit',
-              status: 'In Transit',
-              location: 'Distribution Center, Los Angeles, CA',
-              checkpoints: [{
-                location: 'Distribution Center, Los Angeles, CA',
-                coordinates: { lat: 34.0522, lng: -118.2437 }
-              }],
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          }
-        }), 
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'AfterShip API key not configured' }), 
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Fetch tracking info from AfterShip API
-    const response = await fetch(`https://api.aftership.com/v4/trackings/${tracking_id}`, {
+    // Fetch tracking info from AfterShip API using tracking number query
+    const url = new URL('https://api.aftership.com/v4/trackings')
+    url.searchParams.set('tracking_numbers', tracking_id)
+
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
-        'aftership-api-key': aftershipApiKey,
+        'aftership-api-key': aftershipApiKey!,
         'Content-Type': 'application/json',
       }
     })
@@ -58,54 +45,57 @@ serve(async (req) => {
 
     if (!response.ok) {
       console.error('AfterShip API error:', result)
-      // Return mock data if API fails
       return new Response(
-        JSON.stringify({
-          data: {
-            tracking: {
-              tracking_number: tracking_id,
-              tag: 'InTransit',
-              status: 'In Transit',
-              location: 'Distribution Center, Los Angeles, CA',
-              checkpoints: [{
-                location: 'Distribution Center, Los Angeles, CA',
-                coordinates: { lat: 34.0522, lng: -118.2437 }
-              }],
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          }
-        }), 
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Failed to fetch tracking info', details: result }), 
+        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
+    // Normalize AfterShip response -> UI-friendly shape
+    const tracking = result?.data?.trackings?.[0]
+    if (!tracking) {
+      return new Response(
+        JSON.stringify({ error: 'Tracking not found' }), 
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const checkpoints = Array.isArray(tracking.checkpoints) ? tracking.checkpoints : []
+    const latest = checkpoints.length ? checkpoints[checkpoints.length - 1] : null
+    const tagRaw = tracking.tag ?? tracking.status ?? 'Unknown'
+    const tagDisplay = typeof tagRaw === 'string'
+      ? tagRaw.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2')
+      : 'Unknown'
+
+    const normalized = {
+      data: {
+        tracking: {
+          tracking_number: tracking.tracking_number ?? tracking_id,
+          tag: tagDisplay,
+          status: tagDisplay,
+          location: latest?.location || latest?.city || tracking.origin_country_iso3 || 'Unknown',
+          checkpoints: checkpoints.map((cp: any) => ({
+            location: cp.location || cp.city || cp.state || cp.country_name || 'Unknown',
+            coordinates: cp.coordinates ?? null,
+            message: cp.message ?? cp.tag ?? '',
+            checkpoint_time: cp.checkpoint_time ?? cp.created_at ?? null,
+          })),
+          created_at: tracking.created_at ?? new Date().toISOString(),
+          updated_at: tracking.updated_at ?? new Date().toISOString(),
+        }
+      }
+    }
+
     return new Response(
-      JSON.stringify(result),
+      JSON.stringify(normalized),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
     console.error('Function error:', error)
-    // Return mock data if function fails
     return new Response(
-      JSON.stringify({
-        data: {
-          tracking: {
-            tracking_number: 'MYAPP12345',
-            tag: 'InTransit',
-            status: 'In Transit',
-            location: 'Distribution Center, Los Angeles, CA',
-            checkpoints: [{
-              location: 'Distribution Center, Los Angeles, CA',
-              coordinates: { lat: 34.0522, lng: -118.2437 }
-            }],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        }
-      }), 
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: 'Internal server error' }), 
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
