@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAdmin: boolean;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -25,6 +26,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const checkAdminRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+      
+      setIsAdmin(!error && data?.role === 'admin');
+    } catch {
+      setIsAdmin(false);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -33,6 +50,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Check admin role when user changes
+        if (session?.user) {
+          setTimeout(() => checkAdminRole(session.user.id), 0);
+        } else {
+          setIsAdmin(false);
+        }
       }
     );
 
@@ -41,6 +65,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Check admin role for existing session
+      if (session?.user) {
+        setTimeout(() => checkAdminRole(session.user.id), 0);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -75,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    isAdmin,
     signUp,
     signIn,
     signOut,

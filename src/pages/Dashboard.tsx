@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ interface Shipment {
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -158,8 +160,13 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <Truck className="h-8 w-8 text-primary" />
               <div>
-                <h1 className="text-3xl font-bold">Dashboard</h1>
-                <p className="text-muted-foreground">Welcome back, {user?.email}</p>
+                <h1 className="text-3xl font-bold">
+                  {isAdmin ? 'Admin Dashboard' : 'Dashboard'}
+                </h1>
+                <p className="text-muted-foreground">
+                  Welcome back, {user?.email}
+                  {isAdmin && <span className="ml-2 px-2 py-1 bg-primary text-primary-foreground text-xs rounded-full">Admin</span>}
+                </p>
               </div>
             </div>
             <Button variant="outline" onClick={signOut}>
@@ -206,7 +213,9 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Shipments</CardTitle>
-                  <CardDescription>Manage all your shipments</CardDescription>
+                  <CardDescription>
+                    {isAdmin ? 'Manage all shipments in the system' : 'Manage all your shipments'}
+                  </CardDescription>
                 </div>
                 <Button onClick={() => setShowForm(!showForm)}>
                   <Plus className="h-4 w-4 mr-2" />
