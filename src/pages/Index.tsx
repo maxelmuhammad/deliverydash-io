@@ -63,7 +63,7 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="flex items-center justify-center gap-3 mb-6">
               <Truck className="h-12 w-12" />
-              <h1 className="text-4xl md:text-6xl font-bold">DeliveryDash</h1>
+              <h1 className="text-4xl md:text-6xl font-bold">doublequick</h1>
             </div>
             <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-2xl mx-auto">
               Track your packages in real-time with our modern delivery tracking system. 
@@ -96,9 +96,7 @@ const Index = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Choose DeliveryDash?
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose doublequick?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Experience seamless package tracking with our cutting-edge technology
             </p>
