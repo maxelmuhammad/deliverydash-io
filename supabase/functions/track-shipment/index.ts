@@ -36,21 +36,18 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // First, check our local database
+    // First, check our local database using secure public tracking function
     const { data: localShipment, error: localError } = await supabase
-      .from('shipments')
-      .select('*')
-      .eq('id', tracking_id)
-      .maybeSingle()
+      .rpc('track_shipment_public', { tracking_id })
 
     if (localError) {
       console.error('Local database error:', localError)
     }
 
-    // If found locally, return it
-    if (localShipment) {
+    // If found locally, return it (limited data for security)
+    if (localShipment && localShipment.length > 0) {
       return new Response(
-        JSON.stringify(localShipment as TrackingResponse),
+        JSON.stringify(localShipment[0] as TrackingResponse),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -86,8 +83,8 @@ serve(async (req) => {
               updated_at: tracking.updated_at || new Date().toISOString(),
             }
 
-            // Save to our database for future reference
-            await supabase.from('shipments').upsert(mappedData)
+            // Note: We don't save AfterShip data to local database anymore
+            // to avoid user_id constraint issues. AfterShip data is returned directly.
 
             return new Response(
               JSON.stringify(mappedData),

@@ -22,6 +22,7 @@ export type Database = {
           location: string
           status: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           coordinates?: Json | null
@@ -30,6 +31,7 @@ export type Database = {
           location: string
           status?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           coordinates?: Json | null
@@ -38,6 +40,7 @@ export type Database = {
           location?: string
           status?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -70,6 +73,16 @@ export type Database = {
       has_role: {
         Args: { _role: string; _user_id: string }
         Returns: boolean
+      }
+      track_shipment_public: {
+        Args: { tracking_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          location: string
+          status: string
+          updated_at: string
+        }[]
       }
     }
     Enums: {

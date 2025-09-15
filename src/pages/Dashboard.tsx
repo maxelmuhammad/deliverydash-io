@@ -83,7 +83,7 @@ const Dashboard = () => {
       } else {
         const { error } = await supabase
           .from('shipments')
-          .insert([formData]);
+          .insert([{ ...formData, user_id: user?.id }]);
 
         if (error) throw error;
         

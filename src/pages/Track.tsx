@@ -32,7 +32,29 @@ const Track = () => {
     setSearched(true);
 
     try {
-      // Use the edge function for tracking - checks local shipments first, then AfterShip
+      // First try local database with secure public tracking function
+      const { data: localData, error: localError } = await supabase
+        .rpc('track_shipment_public', { tracking_id: trackingId.trim() });
+
+      if (localData && localData.length > 0) {
+        // Found in local database
+        const shipmentData = localData[0];
+        setShipment({
+          id: shipmentData.id,
+          status: shipmentData.status,
+          location: shipmentData.location,
+          coordinates: null, // Don't expose coordinates in public tracking
+          created_at: shipmentData.created_at,
+          updated_at: shipmentData.updated_at,
+        });
+        toast({
+          title: "Shipment Found",
+          description: `Tracking successful for ID: ${trackingId}`,
+        });
+        return;
+      }
+
+      // If not found locally, try AfterShip API via edge function
       const { data, error } = await supabase.functions.invoke('track-shipment', {
         body: { tracking_id: trackingId.trim() }
       });
