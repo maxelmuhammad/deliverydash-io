@@ -32,8 +32,8 @@ const Track = () => {
     setSearched(true);
 
     try {
-      // Use the edge function for tracking
-      const { data, error } = await supabase.functions.invoke('track', {
+      // Use the edge function for tracking - checks local shipments first, then AfterShip
+      const { data, error } = await supabase.functions.invoke('track-shipment', {
         body: { tracking_id: trackingId.trim() }
       });
 
