@@ -217,7 +217,7 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Truck className="h-6 w-6" />
-            <span className="font-bold text-lg">DeliveryDash</span>
+            <span className="font-bold text-lg">doublequick</span>
           </div>
           <p className="text-primary-foreground/80">
             © 2025 DeliveryDash. A modern delivery tracking solution.
