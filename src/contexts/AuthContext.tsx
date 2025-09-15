@@ -76,6 +76,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string) => {
+    // Only allow admin email to sign up
+    if (email !== 'doublequickexpresscourierservicesser@gmail.com') {
+      return { error: { message: 'Access restricted. Only authorized users can create accounts.' } };
+    }
+    
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -89,6 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    // Only allow admin email to sign in
+    if (email !== 'doublequickexpresscourierservicesser@gmail.com') {
+      return { error: { message: 'Access denied. This email is not authorized to access the system.' } };
+    }
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
