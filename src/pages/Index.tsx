@@ -7,20 +7,21 @@ import { Truck, Search, Shield, Users, MapPin, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
 const Index = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [trackingId, setTrackingId] = useState("MYAPP12345");
   const [trackingResult, setTrackingResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-
   const handleCreateDemoTracking = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-tracking');
-      
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('create-tracking');
       if (error) throw error;
-      
       toast.success("Demo tracking MYAPP12345 created successfully!");
       setTrackingResult(data);
     } catch (error) {
@@ -30,21 +31,22 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-
   const handleTrackPackage = async () => {
     if (!trackingId.trim()) {
       toast.error("Please enter a tracking ID");
       return;
     }
-
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('track', {
-        body: { tracking_id: trackingId }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('track', {
+        body: {
+          tracking_id: trackingId
+        }
       });
-      
       if (error) throw error;
-      
       setTrackingResult(data);
       toast.success("Tracking information fetched!");
     } catch (error) {
@@ -54,9 +56,7 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary to-primary-hover text-primary-foreground">
         <div className="container mx-auto px-4 py-20">
@@ -76,21 +76,17 @@ const Index = () => {
                   Track Package
                 </Link>
               </Button>
-              {user ? (
-                <Button asChild variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              {user ? <Button asChild variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                   <Link to="/dashboard">
                     <Shield className="h-5 w-5 mr-2" />
                     Dashboard
                   </Link>
-                </Button>
-              ) : (
-                <Button asChild variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                </Button> : <Button asChild variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                   <Link to="/auth">
                     <Users className="h-5 w-5 mr-2" />
                     Admin Login
                   </Link>
-                </Button>
-              )}
+                </Button>}
             </div>
           </div>
         </div>
@@ -166,34 +162,16 @@ const Index = () => {
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Test Our Tracking System</h2>
             <div className="space-y-6">
-              <Button 
-                onClick={handleCreateDemoTracking} 
-                disabled={isLoading}
-                size="lg"
-                className="w-full sm:w-auto"
-              >
-                {isLoading ? "Creating..." : "Create Demo Tracking"}
-              </Button>
+              
               
               <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <Input
-                  value={trackingId}
-                  onChange={(e) => setTrackingId(e.target.value)}
-                  placeholder="Enter tracking ID"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleTrackPackage} 
-                  disabled={isLoading || !trackingId.trim()}
-                  size="lg"
-                  className="w-full sm:w-auto"
-                >
+                <Input value={trackingId} onChange={e => setTrackingId(e.target.value)} placeholder="Enter tracking ID" className="flex-1" />
+                <Button onClick={handleTrackPackage} disabled={isLoading || !trackingId.trim()} size="lg" className="w-full sm:w-auto">
                   {isLoading ? "Tracking..." : "Track Package"}
                 </Button>
               </div>
 
-              {trackingResult && (
-                <Card className="text-left mt-6">
+              {trackingResult && <Card className="text-left mt-6">
                   <CardHeader>
                     <CardTitle>Tracking Result</CardTitle>
                   </CardHeader>
@@ -202,8 +180,7 @@ const Index = () => {
                       {JSON.stringify(trackingResult, null, 2)}
                     </pre>
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
             </div>
           </div>
         </div>
@@ -224,19 +201,15 @@ const Index = () => {
                 Start Tracking Now
               </Link>
             </Button>
-            {user ? (
-              <Link to="/dashboard">
+            {user ? <Link to="/dashboard">
                 <Button variant="outline" size="lg">
                   Dashboard
                 </Button>
-              </Link>
-            ) : (
-              <Link to="/auth">
+              </Link> : <Link to="/auth">
                 <Button variant="outline" size="lg">
                   Admin Login
                 </Button>
-              </Link>
-            )}
+              </Link>}
           </div>
         </div>
       </section>
@@ -253,8 +226,6 @@ const Index = () => {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
