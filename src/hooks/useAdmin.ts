@@ -5,7 +5,7 @@ export const useAdmin = () => {
   
   return {
     isAdmin,
-    isAdminEmail: user?.email === 'doublequickexpresscourierservicesser@gmail.com',
+    isAdminEmail: user?.email === 'doublequickexpresscouriersserv@gmail.com',
     canManageAllShipments: isAdmin,
     canViewAllShipments: isAdmin,
   };

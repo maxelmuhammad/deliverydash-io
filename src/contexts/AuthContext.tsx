@@ -76,8 +76,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    // Only allow admin email to sign up
-    if (email !== 'doublequickexpresscourierservicesser@gmail.com') {
+    // Only allow specific emails to sign up
+    const allowedEmails = [
+      'maxelmd294@gmail.com',
+      'doublequickexpresscouriersserv@gmail.com'
+    ];
+    
+    if (!allowedEmails.includes(email)) {
       return { error: { message: 'Access restricted. Only authorized users can create accounts.' } };
     }
     
@@ -94,8 +99,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    // Only allow admin email to sign in
-    if (email !== 'doublequickexpresscourierservicesser@gmail.com') {
+    // Only allow specific emails to sign in
+    const allowedEmails = [
+      'maxelmd294@gmail.com',
+      'doublequickexpresscouriersserv@gmail.com'
+    ];
+    
+    if (!allowedEmails.includes(email)) {
       return { error: { message: 'Access denied. This email is not authorized to access the system.' } };
     }
     
